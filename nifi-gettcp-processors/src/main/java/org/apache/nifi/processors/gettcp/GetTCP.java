@@ -86,7 +86,7 @@ public final class GetTCP extends AbstractProcessor {
 
     public static final Relationship REL_SUCCESS = new Relationship.Builder()
             .name("Success")
-            .description("The relationship that all sucessful messages from the WebSocket will be sent to")
+            .description("The relationship that all successful messages from the WebSocket will be sent to")
             .build();
 
     public static final Relationship REL_FAILURE = new Relationship.Builder()
@@ -117,7 +117,7 @@ public final class GetTCP extends AbstractProcessor {
     }
 
     private SocketChannel client = null;
-    private SocketRecveiverThread socketRecveiverThread = null;
+    private SocketReceiverThread socketReceiverThread = null;
     private Future receiverThreadFuture = null;
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
     private ComponentLog log = getLogger();
@@ -150,11 +150,11 @@ public final class GetTCP extends AbstractProcessor {
             client.setOption(StandardSocketOptions.SO_RCVBUF,context.getProperty(RECEIVE_BUFFER_SIZE).asInteger());
             client.connect(inetSocketAddress);
             client.configureBlocking(false);
-            socketRecveiverThread = new SocketRecveiverThread(client,context.getProperty(RECEIVE_BUFFER_SIZE).asInteger());
+            socketReceiverThread = new SocketReceiverThread(client,context.getProperty(RECEIVE_BUFFER_SIZE).asInteger());
             if(executorService.isShutdown()){
                 executorService = Executors.newFixedThreadPool(1);
             }
-            receiverThreadFuture = executorService.submit(socketRecveiverThread);
+            receiverThreadFuture = executorService.submit(socketReceiverThread);
 
         } catch (IOException e) {
             throw new ProcessException(e);
@@ -164,7 +164,7 @@ public final class GetTCP extends AbstractProcessor {
     @OnStopped
     public void tearDown() throws ProcessException {
         try {
-            socketRecveiverThread.stopProcessing();
+            socketReceiverThread.stopProcessing();
             receiverThreadFuture.cancel(true);
             executorService.shutdown();
             if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -210,14 +210,14 @@ public final class GetTCP extends AbstractProcessor {
     }
 
 
-    private class SocketRecveiverThread implements Runnable {
+    private class SocketReceiverThread implements Runnable {
 
         private SocketChannel socketChannel = null;
         private boolean keepProcessing = true;
         private int bufferSize;
         private ComponentLog log = getLogger();
 
-        SocketRecveiverThread(SocketChannel client, int bufferSize) {
+        SocketReceiverThread(SocketChannel client, int bufferSize) {
             socketChannel = client;
             this.bufferSize = bufferSize;
         }
